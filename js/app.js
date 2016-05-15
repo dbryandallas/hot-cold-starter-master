@@ -111,8 +111,7 @@ function getFeedback(guess) {
         return true; 
   }
     
-function isValidGuess(guess) {
-    /* trusting in JavaScript Or short circuit here! */
+function isValidGuess(guess) {    
     if(guess === undefined || guess === null || guess.trim().length === 0 ||
         !isInteger(guess) || guess < 1 || guess > 100) {
         alert("Please enter an integer between 1 and 100.");
