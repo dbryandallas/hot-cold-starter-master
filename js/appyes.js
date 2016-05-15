@@ -1,49 +1,42 @@
 $(document).ready(function(){
-  newGame();
+    newGame();
 
+    /*--- Display information modal box ---*/
+    $(".what").click(function(){
+        $(".overlay").fadeIn(1000);
 
-/*display modal box*/
+    });
 
-$(".what").click(function(){
-  $(".overlay").fadeIn(1000);
-});
+    /*--- Hide information modal box ---*/
+    $("a.close").click(function(){
+        $(".overlay").fadeOut(1000);
+    });
 
-/*hide box*/
+    $("a.new").click(function() {
+        newGame();
+    });
 
-$("a.close").click(function(){
-  $(".overlay").fadeOut(1000);
-});
-
-/*new game*/
-$("a.new").click(function(){
-  newGame();
-});
-
-$("#guessButton").click(function(event) {
+    $("#guessButton").click(function(event) {
         event.preventDefault();
         guess();
     });
 });
 
-
-/*variables*/
-
-var userGuess;
-var feedBack;
 var secretNumber;
+var feedback;
+var userGuess;
 var guessCount;
 var guessList;
 
 function newGame() {
-  disableInput(false);
-  secretNumber = getSecretNumber();
+    disableInput(false);
+    secretNumber = getSecretNumber();
 
-  
-  userGuess = "";
-  feedback = "Make your Guess!";
-  guessCount = 0;
-  guessList = [];
-  updateDisplay ();
+    feedback = "Make your Guess!";
+    userGuess = "";
+    guessCount = 0;
+    guessList = [];
+    updateDisplay();
 }
 
 function guess() {
@@ -73,20 +66,30 @@ function updateDisplay() {
     }
     $("#userGuess").focus();
 }
+
 function getFeedback(guess) {
-    
+    /*
+      1. First check if correct guess
+      2. Check if hot (within 5) or cold (more than 30 away)
+      3. If first guess then just compare if it is higher or lower than secret.
+      4. If not hot or cold, then compare warmer or cooler to previous guess.
+    */
     if(guess == secretNumber) {
         disableInput(true);
         return "You guessed it!";
     }
 
+    /* within 5 of secret is hot */
     if(guess >= secretNumber - 5 && guess <= secretNumber + 5){
         return "You are hot!";
     }
-  if(guess <= secretNumber - 30 || guess >= secretNumber + 30){
+
+    /* more than 30 away from secret is cold */
+    if(guess <= secretNumber - 30 || guess >= secretNumber + 30){
         return "You are cold!";
     }
- /* Intial Guess */
+
+    /* first guess. Just evaluate high or low. */
     if(guessList.length === 0){
         if (guess > secretNumber) {
             return "Your guess is too high";
@@ -96,21 +99,24 @@ function getFeedback(guess) {
         }
         return;
     }
+
+    /* Colder compared to previous option.*/
     var previousGuess = guessList[guessList.length - 1];
     if((guess > secretNumber && guess > previousGuess) ||
         (guess < secretNumber && guess < previousGuess)) {
         return "You are getting colder";
     }
 
-    /* Warmer*/
+    /* Warmer compared to previous option.*/
     if((guess > secretNumber && guess < previousGuess) ||
         (guess < secretNumber && guess > previousGuess)) {
         return "You are getting warmer";
     }
-    
-        return true; 
-  }
-    
+
+    /* if I get here then there is a missing condition I haven't calculated */
+    return "Houston, we have a problem!";
+}
+
 function isValidGuess(guess) {
     /* trusting in JavaScript Or short circuit here! */
     if(guess === undefined || guess === null || guess.trim().length === 0 ||
@@ -127,9 +133,9 @@ function isValidGuess(guess) {
     return true;
 }
 
-
 function getSecretNumber() {
-    
+    /* Produces random number between 1 and 100
+     see information here: http://www.w3schools.com/jsref/jsref_random.asp */
     return Math.floor((Math.random() * 100) + 1);
 }
 
